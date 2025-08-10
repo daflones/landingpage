@@ -199,24 +199,35 @@ const Reveal: React.FC = () => {
               {/* Container onde o YT.Player será montado */}
               <div ref={playerContainerRef} className="absolute inset-0" />
 
-              {/* Overlay de play inicial e loading customizado */}
+              {/* Área inteira clicável para play/pause quando pronto */}
+              {isPlayerReady && (
+                <button
+                  aria-label="Alternar reprodução"
+                  onClick={() => {
+                    if (!playerRef.current) return
+                    try {
+                      if (isPlaying) {
+                        playerRef.current.pauseVideo()
+                      } else {
+                        // Para a primeira reprodução, opcionalmente mostramos loading
+                        setIsUiLoading(true)
+                        setTimeout(() => { try { playerRef.current.playVideo() } catch {} }, 150)
+                      }
+                    } catch {}
+                  }}
+                  className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                />
+              )}
+
+              {/* Overlay de play inicial minimalista + loading customizado */}
               {!isPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
-                  <button
-                    onClick={() => {
-                      if (!isPlayerReady || !playerRef.current) return
-                      setIsUiLoading(true)
-                      // Pequeno atraso para cobrir o loading do YouTube
-                      setTimeout(() => {
-                        try { playerRef.current.playVideo() } catch {}
-                      }, 300)
-                    }}
-                    className="group relative inline-flex items-center justify-center rounded-full px-8 py-3 text-lg font-montserrat font-semibold text-black bg-gradient-to-r from-yellow-300 to-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.5)] hover:from-yellow-200 hover:to-yellow-400 transition-all"
-                  >
-                    {/* Ícone Play (unicode) */}
-                    <span className="mr-2">►</span>
-                    {t('cta.play') || 'Assistir'}
-                  </button>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                  <div className="relative">
+                    {/* Botão Play minimalista (grande, apenas ícone) */}
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.45)] flex items-center justify-center text-black text-3xl font-bold">
+                      ►
+                    </div>
+                  </div>
 
                   {isUiLoading && (
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 text-gold-light text-sm">
@@ -226,24 +237,6 @@ const Reveal: React.FC = () => {
                       <span className="ml-2">Carregando...</span>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Botão de Pause/Play quando já iniciou */}
-              {isPlayerReady && (
-                <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center pointer-events-none">
-                  <button
-                    onClick={() => {
-                      if (!playerRef.current) return
-                      try {
-                        if (isPlaying) playerRef.current.pauseVideo()
-                        else playerRef.current.playVideo()
-                      } catch {}
-                    }}
-                    className="pointer-events-auto rounded-full px-5 py-2 text-sm font-semibold bg-white/10 text-text-light border border-white/20 hover:bg-white/20 transition"
-                  >
-                    {isPlaying ? 'Pausar ❚❚' : 'Reproduzir ►'}
-                  </button>
                 </div>
               )}
             </div>
