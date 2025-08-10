@@ -6,9 +6,21 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: false
+    open: false,
+    // Allow reverse-proxy hostnames in dev if needed
+    allowedHosts: [
+      'automaclinic-landing.owelyh.easypanel.host',
+      'www.multicrypto.com.br',
+      'multicrypto.com.br'
+    ]
   },
   preview: {
-    open: false
+    open: false,
+    // Allow reverse-proxy hostnames in preview (production preview)
+    allowedHosts: [
+      'automaclinic-landing.owelyh.easypanel.host',
+      'www.multicrypto.com.br',
+      'multicrypto.com.br'
+    ]
   }
 })
