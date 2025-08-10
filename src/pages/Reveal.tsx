@@ -59,10 +59,18 @@ const Reveal: React.FC = () => {
           fs: 0,
           disablekb: 1,
           playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
           // Mantém a UI do YouTube oculta; títulos/botões não aparecem
         },
         events: {
-          onReady: () => setIsPlayerReady(true),
+          onReady: () => {
+            try {
+              // Garante que o vídeo correto esteja carregado
+              playerRef.current?.cueVideoById({ videoId: youtubeVideoId })
+            } catch {}
+            setIsPlayerReady(true)
+          },
           onStateChange: (e: any) => {
             const YTState = (window as any).YT.PlayerState
             if (e.data === YTState.PLAYING) {
