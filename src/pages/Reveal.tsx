@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, Shield, Zap, Star, Lock, TrendingUp, Users, Award } from 'lucide-react'
 import CountdownTimer from '../components/CountdownTimer'
@@ -9,16 +9,78 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 
 const Reveal: React.FC = () => {
   const [userData, setUserData] = useState<any>(null)
+  const [isPlayerReady, setIsPlayerReady] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isUiLoading, setIsUiLoading] = useState(false)
+  const playerRef = useRef<any>(null)
+  const playerContainerRef = useRef<HTMLDivElement | null>(null)
   const { t } = useTranslation()
   // Data de lançamento: 20 de agosto de 2025, 00:00:00 (horário de Brasília)
   const launchDate = "2025-08-20T00:00:00-03:00"
-  const youtubeVideoId = "dQw4w9WgXcQ" // Replace with actual video ID
+  // Shorts: https://youtube.com/shorts/pZNP5DBnolI
+  const youtubeVideoId = "pZNP5DBnolI"
 
   useEffect(() => {
     // Get user data from localStorage (in real app, this would come from Supabase)
     const storedUser = localStorage.getItem('multicrypto_user')
     if (storedUser) {
       setUserData(JSON.parse(storedUser))
+    }
+  }, [])
+
+  // Carrega IFrame API do YouTube e instancia o player controlável
+  useEffect(() => {
+    const ensureYouTubeApi = () => new Promise<void>((resolve) => {
+      if ((window as any).YT && (window as any).YT.Player) return resolve()
+      const tagId = 'youtube-iframe-api'
+      if (!document.getElementById(tagId)) {
+        const tag = document.createElement('script')
+        tag.id = tagId
+        tag.src = 'https://www.youtube.com/iframe_api'
+        document.body.appendChild(tag)
+      }
+      ;(window as any).onYouTubeIframeAPIReady = () => resolve()
+    })
+
+    let mounted = true
+    ensureYouTubeApi().then(() => {
+      if (!mounted || !playerContainerRef.current) return
+      const YT = (window as any).YT
+      playerRef.current = new YT.Player(playerContainerRef.current, {
+        videoId: youtubeVideoId,
+        width: '100%',
+        height: '100%',
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          fs: 0,
+          disablekb: 1,
+          playsinline: 1,
+          // Mantém a UI do YouTube oculta; títulos/botões não aparecem
+        },
+        events: {
+          onReady: () => setIsPlayerReady(true),
+          onStateChange: (e: any) => {
+            const YTState = (window as any).YT.PlayerState
+            if (e.data === YTState.PLAYING) {
+              setIsPlaying(true)
+              setIsUiLoading(false)
+            } else if (e.data === YTState.PAUSED || e.data === YTState.ENDED) {
+              setIsPlaying(false)
+            }
+          }
+        }
+      })
+    })
+
+    return () => {
+      mounted = false
+      try {
+        if (playerRef.current && playerRef.current.destroy) playerRef.current.destroy()
+      } catch {}
     }
   }, [])
 
@@ -117,23 +179,66 @@ const Reveal: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* YouTube Video */}
+          {/* YouTube Shorts vertical player (9:16), com controles customizados */}
           <motion.div
-            className="w-full max-w-4xl mx-auto aspect-video rounded-lg sm:rounded-xl overflow-hidden border border-gold/20 sm:border-2 border-gold/30 shadow-lg shadow-gold/10"
-            initial={{ opacity: 0, scale: 0.9 }}
+            className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[540px] lg:max-w-[600px] mx-auto rounded-xl overflow-hidden border border-gold/30 shadow-lg shadow-gold/10"
+            initial={{ opacity: 0, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, type: 'spring' }}
           >
-            <iframe
-              className="w-full h-full"
-              src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=0&controls=1&showinfo=0&rel=0`}
-              title="Multi Crypto - Lançamento"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-            ></iframe>
+            <div className="relative w-full aspect-[9/16] bg-black">
+              {/* Container onde o YT.Player será montado */}
+              <div ref={playerContainerRef} className="absolute inset-0" />
+
+              {/* Overlay de play inicial e loading customizado */}
+              {!isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
+                  <button
+                    onClick={() => {
+                      if (!isPlayerReady || !playerRef.current) return
+                      setIsUiLoading(true)
+                      // Pequeno atraso para cobrir o loading do YouTube
+                      setTimeout(() => {
+                        try { playerRef.current.playVideo() } catch {}
+                      }, 300)
+                    }}
+                    className="group relative inline-flex items-center justify-center rounded-full px-8 py-3 text-lg font-montserrat font-semibold text-black bg-gradient-to-r from-yellow-300 to-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.5)] hover:from-yellow-200 hover:to-yellow-400 transition-all"
+                  >
+                    {/* Ícone Play (unicode) */}
+                    <span className="mr-2">►</span>
+                    {t('cta.play') || 'Assistir'}
+                  </button>
+
+                  {isUiLoading && (
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 text-gold-light text-sm">
+                      <div className="w-2 h-2 rounded-full bg-gold animate-bounce" />
+                      <div className="w-2 h-2 rounded-full bg-gold animate-bounce [animation-delay:120ms]" />
+                      <div className="w-2 h-2 rounded-full bg-gold animate-bounce [animation-delay:240ms]" />
+                      <span className="ml-2">Carregando...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Botão de Pause/Play quando já iniciou */}
+              {isPlayerReady && (
+                <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center pointer-events-none">
+                  <button
+                    onClick={() => {
+                      if (!playerRef.current) return
+                      try {
+                        if (isPlaying) playerRef.current.pauseVideo()
+                        else playerRef.current.playVideo()
+                      } catch {}
+                    }}
+                    className="pointer-events-auto rounded-full px-5 py-2 text-sm font-semibold bg-white/10 text-text-light border border-white/20 hover:bg-white/20 transition"
+                  >
+                    {isPlaying ? 'Pausar ❚❚' : 'Reproduzir ►'}
+                  </button>
+                </div>
+              )}
+            </div>
           </motion.div>
 
           {/* Floating WhatsApp Button */}
