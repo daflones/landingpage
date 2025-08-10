@@ -1,0 +1,16 @@
+# Nixpacks configuration for Vite + React (static build)
+
+[phases.install]
+cmds = [
+  "npm ci"
+]
+
+[phases.build]
+cmds = [
+  "npm run build"
+]
+
+[start]
+# Vite preview serves the built 'dist' directory
+# Easypanel sets PORT; bind to all interfaces
+cmd = "npm run preview -- --host 0.0.0.0 --port $PORT"

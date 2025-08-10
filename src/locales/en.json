@@ -1,0 +1,102 @@
+{
+  "languages": {
+    "pt": "Portuguese",
+    "en": "English",
+    "es": "Spanish"
+  },
+  "app": { "brand": "Multi Crypto" },
+  "header": { "welcome": "Welcome, {{name}}!" },
+  "countdown": { "launchIn": "Launch in:" },
+  "time": {
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Min",
+    "seconds": "Sec"
+  },
+  "cta": {
+    "vipGroup": "VIP GROUP",
+    "enterVipNow": "JOIN THE VIP GROUP NOW",
+    "finalTitle": "Don't miss this opportunity!",
+    "finalText": "Join the thousands of investors who already secured VIP access to the future of digital finance worldwide.",
+    "guaranteeVip": "GET VIP ACCESS NOW"
+  },
+  "about": {
+    "title": "What is Multi Crypto?",
+    "text": "Multi Crypto is a global cryptocurrency platform that combines artificial intelligence, cutting‑edge blockchain and an intuitive interface to revolutionize your digital investments anywhere in the world."
+  },
+  "benefits": {
+    "security": { "title": "Maximum Security", "desc": "Cutting‑edge blockchain with military‑grade encryption" },
+    "speed": { "title": "Speed", "desc": "Transactions processed in seconds with minimal fees" },
+    "innovation": { "title": "Innovation", "desc": "Global platform with AI integrated for investors around the world" },
+    "profit": { "title": "Profitability", "desc": "Advanced algorithms to maximize your investments" },
+    "community": { "title": "Community", "desc": "Over 10,000 investors worldwide trust Multi Crypto" },
+    "awarded": { "title": "Awarded", "desc": "Internationally recognized in 2024 by industry publications" }
+  },
+  "why": {
+    "title": "Why are we different?",
+    "aiTitle": "🤖 Artificial Intelligence",
+    "aiText": "Our AI analyzes thousands of data points in real time to optimize your investments and identify the best market opportunities.",
+    "globalTitle": "🌍 Global Platform",
+    "globalText": "International presence with multilingual support, multi‑currency (USD, EUR, BRL) and compliance with key regulations in each market."
+  },
+  "technology": {
+    "title": "State‑of‑the‑art Technology",
+    "lightning": "Instant transactions with near‑zero fees",
+    "multisig": "Bank‑grade security with multiple protection layers",
+    "crosschain": "Compatible with all major blockchains"
+  },
+  "security": {
+    "title": "Guaranteed Security",
+    "p1": "Your funds are protected by 256‑bit military‑grade encryption, cold storage and continuous security audits by international firms.",
+    "iso": "ISO 27001 Certification",
+    "audit": "PwC Audit",
+    "insurance": "US$ 100M Insurance",
+    "gdpr": "GDPR/LGPD Compliance"
+  },
+  "plans": {
+    "title": "Plans & Yields (examples)",
+    "subtitle": "Products and yields priced in BRL. International users can deposit via USDT (TRC20 or BEP20) and convert automatically to BRL inside the platform. The amounts below are 30‑day illustrative simulations and do not represent a promise of returns.",
+    "duration": "30 days",
+    "labels": {
+      "investment": "Investment",
+      "daily": "Daily yield",
+      "totalEarnings": "Total earnings",
+      "totalReturn": "Total return",
+      "roi": "Total ROI",
+      "limit": "Limit"
+    }
+  },
+  "capture": {
+    "title": "The Future of Digital Finance Starts Here",
+    "subtitle": "Secure your VIP access to the most anticipated 2025 launch",
+    "nameRequired": "Name is required",
+    "nameMin": "Name must be at least 3 characters",
+    "namePlaceholder": "Full name",
+    "phoneRequired": "WhatsApp is required",
+    "phoneError": {
+      "br": "Brazilian number must have 11 digits",
+      "usca": "Number must have 10 digits",
+      "gb": "Invalid number",
+      "default": "Invalid number"
+    },
+    "submitProcessing": "PROCESSING...",
+    "submitCta": "GET MY VIP ACCESS",
+    "peopleCountText": "people have already secured access",
+    "secureData": "100% secure data",
+    "bottom": {
+      "prefix": "By continuing, you agree to our",
+      "terms": "Terms of Use",
+      "and": "and",
+      "privacy": "Privacy Policy"
+    },
+    "saveError": "Error saving data. Please try again."
+  },
+  "footer": {
+    "rights": "© 2024 Multi Crypto. All rights reserved.",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy",
+    "disclaimer": "Disclaimer",
+    "contact": "Contact",
+    "risk": "Cryptocurrency investments involve risk. Past performance does not guarantee future results. Invest only what you can afford to lose."
+  }
+}

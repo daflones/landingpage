@@ -1,0 +1,126 @@
+{
+  "languages": {
+    "pt": "Português",
+    "en": "Inglês",
+    "es": "Espanhol"
+  },
+  "app": {
+    "brand": "Multi Crypto"
+  },
+  "header": {
+    "welcome": "Bem-vindo, {{name}}!"
+  },
+  "countdown": {
+    "launchIn": "Lançamento em:"
+  },
+  "time": {
+    "days": "Dias",
+    "hours": "Horas",
+    "minutes": "Min",
+    "seconds": "Seg"
+  },
+  "cta": {
+    "vipGroup": "GRUPO VIP",
+    "enterVipNow": "ENTRAR NO GRUPO VIP AGORA",
+    "finalTitle": "Não perca essa oportunidade!",
+    "finalText": "Junte-se aos milhares de investidores que já garantiram acesso VIP ao futuro das finanças digitais no mundo.",
+    "guaranteeVip": "GARANTIR ACESSO VIP AGORA"
+  },
+  "about": {
+    "title": "O que é a Multi Crypto?",
+    "text": "A Multi Crypto é uma plataforma global de criptomoedas que combina inteligência artificial, blockchain de última geração e uma interface intuitiva para revolucionar seus investimentos digitais em qualquer lugar do mundo."
+  },
+  "benefits": {
+    "security": {
+      "title": "Segurança Máxima",
+      "desc": "Tecnologia blockchain de última geração com criptografia militar"
+    },
+    "speed": {
+      "title": "Velocidade",
+      "desc": "Transações processadas em segundos com taxas mínimas"
+    },
+    "innovation": {
+      "title": "Inovação",
+      "desc": "Plataforma global com IA integrada para investidores do mundo inteiro"
+    },
+    "profit": {
+      "title": "Rentabilidade",
+      "desc": "Algoritmos avançados para maximizar seus investimentos"
+    },
+    "community": {
+      "title": "Comunidade",
+      "desc": "Mais de 10.000 investidores ao redor do mundo confiam na Multi Crypto"
+    },
+    "awarded": {
+      "title": "Premiada",
+      "desc": "Reconhecida internacionalmente em 2024 por publicações do setor"
+    }
+  },
+  "why": {
+    "title": "Por que somos diferentes?",
+    "aiTitle": "🤖 Inteligência Artificial",
+    "aiText": "Nossa IA analisa milhares de dados em tempo real para otimizar seus investimentos e identificar as melhores oportunidades do mercado.",
+    "globalTitle": "🌍 Plataforma Global",
+    "globalText": "Presença internacional com suporte multilíngue, multi‑moeda (USD, EUR, BRL) e conformidade com as principais regulamentações de cada mercado."
+  },
+  "technology": {
+    "title": "Tecnologia de Ponta",
+    "lightning": "Transações instantâneas com taxas próximas de zero",
+    "multisig": "Segurança bancária com múltiplas camadas de proteção",
+    "crosschain": "Compatível com todas as principais blockchains"
+  },
+  "security": {
+    "title": "Segurança Garantida",
+    "p1": "Seus fundos estão protegidos por criptografia militar de 256 bits, cold storage e auditoria contínua de segurança por empresas internacionais.",
+    "iso": "Certificação ISO 27001",
+    "audit": "Auditoria PwC",
+    "insurance": "Seguro de US$ 100M",
+    "gdpr": "Conformidade GDPR/LGPD"
+  },
+  "plans": {
+    "title": "Planos e Rendimentos (exemplos)",
+    "subtitle": "Produtos e rendimentos em Real (BRL). Usuários internacionais podem depositar via USDT (TRC20 ou BEP20) e realizar a conversão automática para BRL dentro da plataforma. Os valores abaixo são simulações ilustrativas para 30 dias e não representam promessa de ganhos.",
+    "duration": "30 dias",
+    "labels": {
+      "investment": "Investimento",
+      "daily": "Rendimento/dia",
+      "totalEarnings": "Total de rendimentos",
+      "totalReturn": "Retorno total",
+      "roi": "ROI total",
+      "limit": "Limite"
+    }
+  },
+  "capture": {
+    "title": "O Futuro das Finanças Digitais Começa Aqui",
+    "subtitle": "Garanta seu acesso VIP ao lançamento mais esperado de 2025",
+    "nameRequired": "Nome é obrigatório",
+    "nameMin": "Nome deve ter pelo menos 3 caracteres",
+    "namePlaceholder": "Nome completo",
+    "phoneRequired": "WhatsApp é obrigatório",
+    "phoneError": {
+      "br": "Número brasileiro deve ter 11 dígitos",
+      "usca": "Número deve ter 10 dígitos",
+      "gb": "Número inválido",
+      "default": "Número inválido"
+    },
+    "submitProcessing": "PROCESSANDO...",
+    "submitCta": "GARANTIR MEU ACESSO VIP",
+    "peopleCountText": "pessoas já garantiram acesso",
+    "secureData": "Dados 100% seguros",
+    "bottom": {
+      "prefix": "Ao continuar, você concorda com nossos",
+      "terms": "Termos de Uso",
+      "and": "e",
+      "privacy": "Política de Privacidade"
+    },
+    "saveError": "Erro ao salvar dados. Tente novamente."
+  },
+  "footer": {
+    "rights": "© 2024 Multi Crypto. Todos os direitos reservados.",
+    "terms": "Termos de Uso",
+    "privacy": "Política de Privacidade",
+    "disclaimer": "Disclaimer",
+    "contact": "Contato",
+    "risk": "Investimentos em criptomoedas envolvem riscos. Rentabilidade passada não garante resultados futuros. Invista apenas o que pode perder."
+  }
+}
