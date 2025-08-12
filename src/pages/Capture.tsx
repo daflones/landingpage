@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +10,7 @@ import { countries, Country, formatPhoneNumber } from '../utils/countries'
 import { savePreOrder } from '../lib/supabase'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import RevealSections from './RevealSections'
 
 interface FormData {
   name: string
@@ -23,6 +25,16 @@ const Capture: React.FC = () => {
   const [peopleCount, setPeopleCount] = useState(1000)
   const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]) // Default to Brazil
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [userData, setUserData] = useState<any>(null)
+  const [isPlayerReady, setIsPlayerReady] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [hasStartedPlayback, setHasStartedPlayback] = useState(false)
+  const [autoPlayRequested, setAutoPlayRequested] = useState(false)
+  const [isUiLoading, setIsUiLoading] = useState(false)
+  const playerRef = useRef<any>(null)
+  const playerContainerRef = useRef<HTMLDivElement | null>(null)
+  const youtubeVideoId = 'pZNP5DBnolI'
   
   const {
     register,
@@ -36,6 +48,12 @@ const Capture: React.FC = () => {
       country: 'BR'
     }
   })
+
+  const handleVipClick = () => {
+    const name = (userData?.name || 'Usuário').trim()
+    const message = encodeURIComponent(`Olá! Quero participar do Grupo VIP Multi Crypto, meu nome é ${name}.`)
+    window.open(`https://wa.me/5512982689483?text=${message}`, '_blank')
+  }
 
   const watchedName = watch('name', '')
   const watchedWhatsapp = watch('whatsapp', '')
@@ -73,6 +91,101 @@ const Capture: React.FC = () => {
 
     return () => clearInterval(interval)
   }, [])
+
+  // Carregar YouTube IFrame API e preparar player (vertical 9:16)
+  useEffect(() => {
+    // Só inicializa o player quando o formulário foi enviado e o container existe
+    if (!formSubmitted || !playerContainerRef.current) return
+
+    const ensureYouTubeApi = () => new Promise<void>((resolve) => {
+      if ((window as any).YT && (window as any).YT.Player) return resolve()
+      const tagId = 'youtube-iframe-api'
+      if (!document.getElementById(tagId)) {
+        const tag = document.createElement('script')
+        tag.id = tagId
+        tag.src = 'https://www.youtube.com/iframe_api'
+        document.body.appendChild(tag)
+      }
+      ;(window as any).onYouTubeIframeAPIReady = () => resolve()
+    })
+
+    let cancelled = false
+    ensureYouTubeApi().then(() => {
+      if (cancelled || !playerContainerRef.current || playerRef.current) return
+      const YT = (window as any).YT
+      console.log('[YT] Creating player in container', playerContainerRef.current)
+      playerRef.current = new YT.Player(playerContainerRef.current, {
+        videoId: youtubeVideoId,
+        width: '100%',
+        height: '100%',
+        playerVars: {
+          // After form submit we can request autoplay
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          fs: 0,
+          disablekb: 1,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: () => {
+            try {
+              if (autoPlayRequested && playerRef.current) {
+                console.log('[YT] onReady: autoplay requested, loading and playing')
+                try { playerRef.current.mute() } catch {}
+                playerRef.current.loadVideoById({ videoId: youtubeVideoId })
+              } else {
+                console.log('[YT] onReady: cue video only')
+                playerRef.current?.cueVideoById({ videoId: youtubeVideoId })
+              }
+            } catch {}
+            setIsPlayerReady(true)
+            if (autoPlayRequested && playerRef.current) {
+              try { setIsUiLoading(true); playerRef.current.playVideo() } catch {}
+            }
+          },
+          onStateChange: (e: any) => {
+            const YTState = (window as any).YT.PlayerState
+            if (e.data === YTState.PLAYING) {
+              setIsPlaying(true)
+              setHasStartedPlayback(true)
+              setIsUiLoading(false)
+            } else if (e.data === YTState.PAUSED || e.data === YTState.ENDED) {
+              setIsPlaying(false)
+            }
+          }
+        }
+      })
+      // Fallback: if onReady takes too long, try to load video after 1500ms
+      setTimeout(() => {
+        if (!cancelled && playerRef.current && !isPlayerReady) {
+          console.log('[YT] Fallback: forcing loadVideoById')
+          try { playerRef.current.mute() } catch {}
+          try { playerRef.current.loadVideoById({ videoId: youtubeVideoId }) } catch {}
+        }
+      }, 1500)
+    })
+
+    return () => {
+      cancelled = true
+      try { if (playerRef.current && playerRef.current.destroy) playerRef.current.destroy() } catch {}
+    }
+  }, [formSubmitted])
+
+  // Após submeter, iniciar reprodução quando player estiver pronto
+  useEffect(() => {
+    if (formSubmitted && isPlayerReady && playerRef.current) {
+      setIsUiLoading(true)
+      setTimeout(() => {
+        try { playerRef.current.mute() } catch {}
+        try { playerRef.current.playVideo() } catch {}
+      }, 50)
+    }
+  }, [formSubmitted, isPlayerReady])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -129,15 +242,21 @@ const Capture: React.FC = () => {
       console.log('Resposta do savePreOrder:', savedData)
       
       if (savedData) {
-        // Store data in localStorage for the reveal page
-        localStorage.setItem('multicrypto_user', JSON.stringify({
+        const stored = {
           name: preOrderData.nome,
           whatsapp: preOrderData.telefone,
           id: savedData.id
-        }))
-        
-        // Redirect to reveal page
-        navigate('/reveal')
+        }
+        localStorage.setItem('multicrypto_user', JSON.stringify(stored))
+        setUserData(stored)
+        setFormSubmitted(true)
+        // Mark autoplay requested due to user's click
+        setAutoPlayRequested(true)
+        // Try to play immediately if player is ready
+        if (isPlayerReady && playerRef.current) {
+          try { playerRef.current.mute() } catch {}
+          try { setIsUiLoading(true); playerRef.current.playVideo() } catch {}
+        }
       } else {
         throw new Error('Failed to save pre-order data')
       }
@@ -219,14 +338,15 @@ const Capture: React.FC = () => {
               </p>
             </motion.div>
 
-            {/* Form */}
-            <motion.form
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
+            {/* Form or Video */}
+            {!formSubmitted ? (
+              <motion.form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+              >
               {/* Name Field */}
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold-light">
@@ -348,7 +468,66 @@ const Capture: React.FC = () => {
               >
                 {isSubmitting ? t('capture.submitProcessing') : t('capture.submitCta')}
               </GlowButton>
-            </motion.form>
+              {/* Scroll hint below the form */}
+              <motion.div
+                className="text-center mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <p className="text-gold-light text-sm font-inter">
+                  Role para baixo para obter mais informações
+                </p>
+              </motion.div>
+              </motion.form>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <div className="relative w-full aspect-[9/16] bg-black">
+                  <div ref={playerContainerRef} className="absolute inset-0" />
+                  {/* Área inteira para toggle play/pause */}
+                  <button
+                    aria-label="Alternar reprodução"
+                    onClick={() => {
+                      setAutoPlayRequested(true)
+                      if (!playerRef.current) return
+                      try {
+                        if (isPlaying) { playerRef.current.pauseVideo() }
+                        else {
+                          setIsUiLoading(true)
+                          setTimeout(() => {
+                            try { playerRef.current.mute() } catch {}
+                            try { playerRef.current.playVideo() } catch {}
+                          }, 50)
+                        }
+                      } catch {}
+                    }}
+                    className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                  />
+                  {/* Overlay de play inicial minimalista + loading */}
+                  {!isPlaying && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.45)] flex items-center justify-center text-black text-3xl font-bold">
+                        ►
+                      </div>
+                      {isUiLoading && (
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 text-gold-light text-sm">
+                          <div className="w-2 h-2 rounded-full bg-gold animate-bounce" />
+                          <div className="w-2 h-2 rounded-full bg-gold animate-bounce [animation-delay:120ms]" />
+                          <div className="w-2 h-2 rounded-full bg-gold animate-bounce [animation-delay:240ms]" />
+                          <span className="ml-2">Carregando...</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Floating button moved to portal (outside transform/overflow contexts) */}
 
             {/* People Counter */}
             <motion.div
@@ -398,6 +577,27 @@ const Capture: React.FC = () => {
           </motion.p>
         </motion.div>
       </div>
+      {/* Reveal sections appended below to keep all info on one page */}
+      <div className="relative z-10 mt-8">
+        <RevealSections onVipClick={handleVipClick} compact />
+      </div>
+
+      {/* Portal: floating VIP button attached to document.body (follows page scroll) */}
+      {formSubmitted && hasStartedPlayback && createPortal(
+        (
+          <motion.div
+            className="fixed bottom-8 right-8 z-50"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <GlowButton onClick={handleVipClick} className="rounded-full p-4 shadow-2xl" size="lg">
+              <MessageCircle className="w-6 h-6 mr-2" />
+              {t('cta.vipGroup')}
+            </GlowButton>
+          </motion.div>
+        ),
+        document.body
+      )}
     </div>
   )
 }

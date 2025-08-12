@@ -7,20 +7,22 @@ console.log('Supabase Anon Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '*** 
 // Configuração do cliente Supabase
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+export const SUPABASE_ENABLED = Boolean(supabaseUrl && supabaseAnonKey)
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Erro: Variáveis de ambiente do Supabase não configuradas corretamente.')
-  console.error('Verifique se o arquivo .env contém VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY')
-  throw new Error('Configuração do Supabase incompleta')
+if (!SUPABASE_ENABLED) {
+  console.warn('[Supabase] Variáveis de ambiente ausentes no ambiente local. A aplicação funcionará com fallback local (mock).')
+  console.warn('Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY em .env.local para usar o banco real no dev.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: false,
-    detectSessionInUrl: false
-  }
-})
+export const supabase = SUPABASE_ENABLED
+  ? createClient(supabaseUrl as string, supabaseAnonKey as string, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: false,
+        detectSessionInUrl: false
+      }
+    })
+  : null as any
 
 export interface PreOrderData {
   id?: string
@@ -77,6 +79,10 @@ const createPreOrderTable = async (): Promise<boolean> => {
 // Função para verificar se a tabela existe
 export const checkTableExists = async (tableName: string): Promise<boolean> => {
   try {
+    if (!SUPABASE_ENABLED) {
+      // Em dev sem env, considere que "existe" para não bloquear o fluxo
+      return true
+    }
     // Tenta fazer uma consulta simples à tabela para ver se ela existe
     const { error } = await supabase
       .from(tableName)
@@ -104,6 +110,15 @@ export const checkTableExists = async (tableName: string): Promise<boolean> => {
 export const savePreOrder = async (userData: Omit<PreOrderData, 'id' | 'created_at'>): Promise<PreOrderData | null> => {
   try {
     console.log('Tentando salvar no Supabase:', userData)
+    if (!SUPABASE_ENABLED) {
+      // Fallback local: simula salvamento e retorna um ID
+      const mockId = (self as any)?.crypto?.randomUUID?.() || String(Date.now())
+      const record: PreOrderData = { id: mockId, nome: userData.nome, telefone: userData.telefone, created_at: new Date().toISOString() }
+      const existing = JSON.parse(localStorage.getItem('multicrypto_preorders') || '[]')
+      existing.push(record)
+      localStorage.setItem('multicrypto_preorders', JSON.stringify(existing))
+      return record
+    }
     
     // Verifica se a tabela existe, se não existir, tenta criar
     const tableExists = await checkTableExists('pre_order')

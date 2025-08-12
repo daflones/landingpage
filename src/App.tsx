@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Capture from './pages/Capture'
 import Reveal from './pages/Reveal'
@@ -14,7 +14,7 @@ function App() {
         >
           <Routes>
             <Route path="/" element={<Capture />} />
-            <Route path="/reveal" element={<Reveal />} />
+            <Route path="/reveal" element={<Navigate to="/" replace />} />
           </Routes>
         </motion.div>
       </div>
