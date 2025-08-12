@@ -119,8 +119,7 @@ const Capture: React.FC = () => {
         width: '100%',
         height: '100%',
         playerVars: {
-          // After form submit we can request autoplay
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           rel: 0,
           modestbranding: 1,
@@ -135,8 +134,7 @@ const Capture: React.FC = () => {
           onReady: () => {
             try {
               if (autoPlayRequested && playerRef.current) {
-                console.log('[YT] onReady: autoplay requested, loading and playing')
-                try { playerRef.current.mute() } catch {}
+                console.log('[YT] onReady: autoplay requested, loading and playing (with sound)')
                 playerRef.current.loadVideoById({ videoId: youtubeVideoId })
               } else {
                 console.log('[YT] onReady: cue video only')
@@ -145,7 +143,7 @@ const Capture: React.FC = () => {
             } catch {}
             setIsPlayerReady(true)
             if (autoPlayRequested && playerRef.current) {
-              try { setIsUiLoading(true); playerRef.current.playVideo() } catch {}
+              try { setIsUiLoading(true); playerRef.current.unMute?.(); playerRef.current.setVolume?.(100); playerRef.current.playVideo() } catch {}
             }
           },
           onStateChange: (e: any) => {
@@ -164,7 +162,6 @@ const Capture: React.FC = () => {
       setTimeout(() => {
         if (!cancelled && playerRef.current && !isPlayerReady) {
           console.log('[YT] Fallback: forcing loadVideoById')
-          try { playerRef.current.mute() } catch {}
           try { playerRef.current.loadVideoById({ videoId: youtubeVideoId }) } catch {}
         }
       }, 1500)
@@ -181,7 +178,7 @@ const Capture: React.FC = () => {
     if (formSubmitted && isPlayerReady && playerRef.current) {
       setIsUiLoading(true)
       setTimeout(() => {
-        try { playerRef.current.mute() } catch {}
+        try { playerRef.current.unMute?.(); playerRef.current.setVolume?.(100) } catch {}
         try { playerRef.current.playVideo() } catch {}
       }, 50)
     }
@@ -254,7 +251,7 @@ const Capture: React.FC = () => {
         setAutoPlayRequested(true)
         // Try to play immediately if player is ready
         if (isPlayerReady && playerRef.current) {
-          try { playerRef.current.mute() } catch {}
+          try { playerRef.current.unMute?.(); playerRef.current.setVolume?.(100) } catch {}
           try { setIsUiLoading(true); playerRef.current.playVideo() } catch {}
         }
       } else {
@@ -499,7 +496,7 @@ const Capture: React.FC = () => {
                         else {
                           setIsUiLoading(true)
                           setTimeout(() => {
-                            try { playerRef.current.mute() } catch {}
+                            try { playerRef.current.unMute?.(); playerRef.current.setVolume?.(100) } catch {}
                             try { playerRef.current.playVideo() } catch {}
                           }, 50)
                         }
