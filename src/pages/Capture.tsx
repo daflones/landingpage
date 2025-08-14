@@ -52,7 +52,7 @@ const Capture: React.FC = () => {
   const handleVipClick = () => {
     const name = (userData?.name || 'Usuário').trim()
     const message = encodeURIComponent(`Olá! Quero participar do Grupo VIP Multi Crypto, meu nome é ${name}.`)
-    window.open(`https://wa.me/5512982689483?text=${message}`, '_blank')
+    window.open(`https://wa.me/5521968391662?text=${message}`, '_blank')
   }
 
   const watchedName = watch('name', '')
