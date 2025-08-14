@@ -129,7 +129,7 @@ const Reveal: React.FC = () => {
     const name = (userData?.name || 'Usuário').trim()
     const message = encodeURIComponent(`Olá! Quero participar do Grupo VIP Multi Crypto, meu nome é ${name}.`)
     // WhatsApp oficial: +55 (43) 9919-6721 → formato wa.me: 554399196721
-    window.open(`https://wa.me/5512982689483?text=${message}`, '_blank')
+    window.open(`https://wa.me/5521968391662?text=${message}`, '_blank')
   }
 
   return (
